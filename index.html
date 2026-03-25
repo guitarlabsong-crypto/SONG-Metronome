@@ -3,151 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SONG, YOUNG MIN Guitar Lab Metronome</title>
+    <title>SONG, YOUNG MIN Guitar Lab</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #e74c3c; --bg: #ecf0f1; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        
-        .metronome-card { background: white; width: 90%; max-width: 450px; padding: 25px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); position: relative; text-align: center; }
-        
-        /* 워터마크 */
-        .watermark { font-size: 0.7rem; font-weight: bold; color: #bdc3c7; letter-spacing: 1px; margin-bottom: 10px; }
+        :root { 
+            --primary-dark: #2c3e50; /* 메인 어두운 색상 */
+            --accent-red: #e74c3c;   /* 강조용 빨간색 */
+            --bg-light: #ecf0f1;     /* 배경 연회색 */
+        }
 
-        /* 바늘침 (Pendulum) */
-        .visualizer { width: 100%; height: 120px; background: #f9f9f9; border-radius: 15px; position: relative; overflow: hidden; margin-bottom: 20px; border: 1px solid #eee; }
-        .needle { width: 4px; height: 80px; background: var(--primary); position: absolute; bottom: 10px; left: 50%; transform-origin: bottom center; transform: translateX(-50%) rotate(0deg); transition: transform 0.1s ease-out; }
-        .center-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); }
+        /* 전체 화면 중앙 정렬 설정 */
+        body { 
+            font-family: 'Malgun Gothic', sans-serif; 
+            background: var(--bg-light); 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; /* 화면 높이 전체 사용 */
+        }
 
-        .bpm-text { font-size: 3.5rem; font-weight: 800; color: var(--primary); margin: 10px 0; }
+        /* 메인 컨테이너: 가로/세로 상관없이 항상 가운데 정렬 */
+        .app-container { 
+            background: white; 
+            width: 90%; 
+            max-width: 420px; 
+            padding: 30px; 
+            border-radius: 30px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            text-align: center;
+            display: flex;
+            flex-direction: column; /* 세로로 나열 */
+            align-items: center;
+            justify-content: center;
+        }
 
-        /* 박자/음표 버튼 그룹 */
-        .btn-group { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-        .toggle-btn { padding: 10px 15px; border: 2px solid #ddd; border-radius: 12px; background: white; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
-        .toggle-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        /* 워터마크 스타일 */
+        .watermark { 
+            font-size: 0.8rem; 
+            font-weight: bold; 
+            color: #bdc3c7; 
+            margin-bottom: 15px; 
+            letter-spacing: 1px;
+        }
 
-        input[type="range"] { width: 100%; margin: 20px 0; accent-color: var(--primary); }
+        /* 시각화 박스 (바늘침 영역) */
+        .visualizer { 
+            width: 100%; 
+            height: 100px; 
+            background: #fdfdfd; 
+            border: 1px solid #eee; 
+            border-radius: 20px; 
+            position: relative; 
+            overflow: hidden; 
+            margin-bottom: 20px;
+        }
 
-        .start-btn { width: 100%; padding: 18px; border: none; border-radius: 15px; background: var(--accent); color: white; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .start-btn.running { background: #34495e; }
+        /* 메트로놈 바늘침 */
+        .needle { 
+            width: 4px; 
+            height: 70px; 
+            background: var(--primary-dark); 
+            position: absolute; 
+            bottom: 5px; 
+            left: 50%; 
+            transform-origin: bottom center; /* 아래쪽을 축으로 회전 */
+            transform: translateX(-50%) rotate(0deg); 
+            transition: transform 0.1s ease-out; 
+        }
 
-        /* 가로 모드 최적화 */
-        @media (orientation: landscape) and (max-height: 500px) {
-            .metronome-card { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 600px; padding: 15px; }
-            .visualizer { height: 100px; }
+        /* BPM 숫자 텍스트 */
+        .bpm-display { font-size: 4rem; font-weight: 900; color: var(--primary-dark); margin: 0; }
+
+        /* 공통 버튼 스타일 */
+        .label { font-size: 0.8rem; color: #7f8c8d; margin: 10px 0 5px; font-weight: bold; }
+        .btn-group { display: flex; justify-content: center; gap: 6px; margin-bottom: 15px; flex-wrap: wrap; }
+        .toggle-btn { 
+            padding: 8px 12px; border: 2px solid #ddd; border-radius: 10px; 
+            background: white; cursor: pointer; font-size: 0.85rem; font-weight: bold;
+        }
+        .toggle-btn.active { background: var(--primary-dark); color: white; border-color: var(--primary-dark); }
+
+        /* 슬라이더 스타일 */
+        input[type="range"] { width: 100%; height: 8px; border-radius: 5px; accent-color: var(--primary-dark); cursor: pointer; margin-bottom: 10px; }
+
+        /* 시작 버튼 */
+        .start-btn { 
+            width: 100%; padding: 20px; border: none; border-radius: 15px; 
+            background: var(--accent-red); color: white; font-size: 1.4rem; 
+            font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+        .start-btn.running { background: #34495e; } /* 실행 중일 때 색상 변경 */
+
+        /* 가로 화면 최적화 (가로 길이가 짧을 때 대응) */
+        @media (orientation: landscape) {
+            .app-container { padding: 15px; max-width: 500px; }
+            .bpm-display { font-size: 3rem; }
+            .visualizer { height: 80px; }
         }
     </style>
 </head>
 <body>
 
-<div class="metronome-card">
+<div class="app-container">
     <div class="watermark">SONG, YOUNG MIN GUITAR LAB</div>
     
     <div class="visualizer">
         <div class="needle" id="needle"></div>
-        <div class="center-dot"></div>
     </div>
 
-    <div class="main-controls">
-        <div class="bpm-text" id="bpmText">120</div>
-        <input type="range" id="tempoRange" min="40" max="240" value="120">
+    <div class="bpm-display" id="bpmText">120</div>
+    
+    <div class="label">TEMPO (BPM)</div>
+    <input type="range" id="tempoRange" min="40" max="240" value="120">
 
-        <div class="btn-group" id="timeSigGroup">
-            <button class="toggle-btn" data-val="3">3/4</button>
-            <button class="toggle-btn active" data-val="4">4/4</button>
-        </div>
+    <div class="label">VOLUME</div>
+    <input type="range" id="volumeRange" min="0" max="100" value="70">
 
-        <div class="btn-group" id="noteValGroup">
-            <button class="toggle-btn active" data-val="1">4분음표</button>
-            <button class="toggle-btn" data-val="4">16분음표</button>
-        </div>
-
-        <button id="startBtn" class="start-btn">START</button>
+    <div class="label">TIME SIGNATURE</div>
+    <div class="btn-group" id="timeSigGroup">
+        <button class="toggle-btn" data-val="3">3/4</button>
+        <button class="toggle-btn active" data-val="4">4/4</button>
     </div>
+
+    <div class="label">SUBDIVISION (음표 분할)</div>
+    <div class="btn-group" id="noteValGroup">
+        <button class="toggle-btn active" data-val="1">4분</button>
+        <button class="toggle-btn" data-val="2">8분</button>
+        <button class="toggle-btn" data-val="3">3연음</button>
+        <button class="toggle-btn" data-val="4">16분</button>
+    </div>
+
+    <button id="startBtn" class="start-btn">START</button>
 </div>
 
 <script>
-    let audioCtx = null;
-    let isRunning = false;
-    let tempo = 120;
-    let beatsPerMeasure = 4;
-    let subdivision = 1;
-    let currentBeat = 0;
-    let nextTickTime = 0;
-    let timerID = null;
+    // --- 설정 변수 선언 ---
+    let audioCtx = null;       // 오디오 시스템 컨텍스트
+    let gainNode = null;       // 볼륨 조절 노드
+    let isRunning = false;     // 작동 여부 상태
+    let tempo = 120;           // 현재 템포 (BPM)
+    let beatsPerMeasure = 4;   // 마디당 박자 수
+    let subdivision = 1;       // 한 박자를 나누는 단위 (1:4분, 2:8분, 3:3연음...)
+    let currentBeat = 0;       // 현재 몇 번째 틱인지 카운트
+    let nextTickTime = 0;      // 다음 소리가 날 정확한 시간
+    let timerID = null;        // 타이머 중지를 위한 ID
 
+    // --- HTML 요소 가져오기 ---
     const needle = document.getElementById('needle');
     const startBtn = document.getElementById('startBtn');
     const tempoRange = document.getElementById('tempoRange');
+    const volumeRange = document.getElementById('volumeRange');
     const bpmText = document.getElementById('bpmText');
 
-    // 오디오 클릭 소리 생성
+    /**
+     * 실제 클릭 소리를 생성하는 함수
+     * @param {number} time - 소리가 출력될 정확한 시점
+     * @param {boolean} isStrong - 강박(첫 박) 여부
+     */
     function playClick(time, isStrong) {
-        const osc = audioCtx.createOscillator();
-        const envelope = audioCtx.createGain();
+        const osc = audioCtx.createOscillator(); // 소리 파형 생성기
+        const envelope = audioCtx.createGain();  // 소리 크기 봉투(음량 급감쇄용)
 
-        osc.frequency.value = isStrong ? 1200 : 800;
-        envelope.gain.exponentialRampToValueAtTime(1, time);
-        envelope.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+        osc.type = 'sine'; // 부드러운 사인파 선택
+        osc.frequency.value = isStrong ? 1200 : 800; // 강박은 높은 음, 약박은 낮은 음
 
-        osc.connect(envelope);
-        envelope.connect(audioCtx.destination);
-        osc.start(time);
-        osc.stop(time + 0.05);
+        // 볼륨 감쇄 로직: 소리가 틱 하고 짧게 나도록 설정
+        envelope.gain.setValueAtTime(parseFloat(volumeRange.value) / 100, time); // 현재 볼륨 설정
+        envelope.gain.exponentialRampToValueAtTime(0.001, time + 0.05); // 0.05초만에 무음으로
 
-        // 바늘 애니메이션 연동
-        const angle = (currentBeat % 2 === 0) ? -30 : 30;
+        osc.connect(envelope); // 파형과 볼륨 연결
+        envelope.connect(audioCtx.destination); // 최종 출력 장치 연결
+
+        osc.start(time); // 재생 시작
+        osc.stop(time + 0.05); // 재생 중지
+
+        // 바늘 애니메이션: 틱이 발생할 때마다 각도 변경
+        const angle = (currentBeat % 2 === 0) ? -35 : 35; // 짝수/홀수 틱에 따라 좌우 반전
         setTimeout(() => {
             needle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-        }, (time - audioCtx.currentTime) * 1000);
+        }, (time - audioCtx.currentTime) * 1000); // 정확한 박자에 맞춰 애니메이션 실행
     }
 
+    /**
+     * 시간을 미리 계산하여 소리를 예약하는 스케줄러
+     */
     function scheduler() {
+        // 브라우저의 현재 시간보다 0.1초 앞선 시간까지 미리 예약함 (끊김 방지)
         while (nextTickTime < audioCtx.currentTime + 0.1) {
+            // 마디의 첫 박자인지 확인 (나누는 단위까지 계산)
             const isFirstBeat = (currentBeat % (beatsPerMeasure * subdivision)) === 0;
+            
+            // 클릭 소리 재생 예약
             playClick(nextTickTime, isFirstBeat);
             
-            const secondsPerBeat = 60.0 / tempo / subdivision;
-            nextTickTime += secondsPerBeat;
-            currentBeat++;
+            // 다음 틱이 올 시간 계산 (60초 / 템포 / 분할단위)
+            const secondsPerTick = 60.0 / tempo / subdivision;
+            nextTickTime += secondsPerTick;
+            currentBeat++; // 카운트 증가
         }
+        // 다음 프레임에 다시 실행하도록 예약
         timerID = requestAnimationFrame(scheduler);
     }
 
-    // 이벤트 리스너: 박자 및 음표 선택
-    function setupButtons(groupId, callback) {
+    // --- 버튼 이벤트 설정 함수 ---
+    function setupToggleButtons(groupId, callback) {
         const buttons = document.querySelectorAll(`#${groupId} .toggle-btn`);
         buttons.forEach(btn => {
             btn.addEventListener('click', () => {
+                // 기존 활성화 버튼 해제 후 현재 버튼 활성화
                 document.querySelector(`#${groupId} .active`).classList.remove('active');
                 btn.classList.add('active');
-                callback(btn.dataset.val);
+                callback(btn.dataset.val); // 설정값 변경
             });
         });
     }
 
-    setupButtons('timeSigGroup', val => beatsPerMeasure = parseInt(val));
-    setupButtons('noteValGroup', val => subdivision = parseInt(val));
+    // 박자(3/4, 4/4) 변경 버튼 연결
+    setupToggleButtons('timeSigGroup', val => beatsPerMeasure = parseInt(val));
+    // 음표 분할(4분, 8분, 3연음, 16분) 변경 버튼 연결
+    setupToggleButtons('noteValGroup', val => subdivision = parseInt(val));
 
+    // 템포 슬라이더 변경 시 숫자 업데이트
     tempoRange.addEventListener('input', (e) => {
         tempo = e.target.value;
         bpmText.innerText = tempo;
     });
 
+    // 시작/중지 버튼 클릭 이벤트
     startBtn.addEventListener('click', () => {
+        // 첫 실행 시 오디오 컨텍스트 초기화 (사용자 상호작용 필요)
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
-        isRunning = !isRunning;
+        isRunning = !isRunning; // 상태 반전
+
         if (isRunning) {
-            currentBeat = 0;
-            nextTickTime = audioCtx.currentTime;
-            scheduler();
+            currentBeat = 0; // 박자 초기화
+            nextTickTime = audioCtx.currentTime; // 현재 시간부터 시작
+            scheduler(); // 스케줄러 시작
             startBtn.innerText = 'STOP';
             startBtn.classList.add('running');
         } else {
-            cancelAnimationFrame(timerID);
+            cancelAnimationFrame(timerID); // 스케줄러 중단
             startBtn.innerText = 'START';
             startBtn.classList.remove('running');
-            needle.style.transform = `translateX(-50%) rotate(0deg)`;
+            needle.style.transform = `translateX(-50%) rotate(0deg)`; // 바늘 원위치
         }
     });
 </script>
