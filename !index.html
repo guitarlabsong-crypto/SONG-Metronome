@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Metronome</title>
+    <style>
+        :root { --main-color: #4a90e2; --bg-color: #f4f7f6; }
+        body { font-family: sans-serif; background: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .container { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
+        
+        /* 반응형 텍스트 및 레이아웃 */
+        h1 { font-size: 1.5rem; color: #333; margin-bottom: 1rem; }
+        .bpm-display { font-size: 4rem; font-weight: bold; color: var(--main-color); margin: 10px 0; }
+        
+        .controls { display: flex; flex-direction: column; gap: 15px; }
+        .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        
+        input[type="range"] { width: 100%; cursor: pointer; }
+        select, button { padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 1rem; }
+        
+        .start-btn { background: var(--main-color); color: white; border: none; font-size: 1.2rem; font-weight: bold; margin-top: 10px; transition: 0.2s; }
+        .start-btn.running { background: #e74c3c; }
+        
+        /* 가로 모드 대응 */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .container { display: flex; max-width: 600px; gap: 20px; align-items: center; }
+            .bpm-display { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div>
+        <h1>Metronome</h1>
+        <div class="bpm-display" id="bpmValue">120</div>
+    </div>
+
+    <div class="controls">
+        <input type="range" id="tempo" min="40" max="240" value="120">
+        
+        <div class="row">
+            <select id="timeSignature">
+                <option value="3">3/4 박자</option>
+                <option value="4" selected>4/4 박자</option>
+            </select>
+            <select id="noteValue">
+                <option value="1">4분 음표</option>
+                <option value="4">16분 음표</option>
+            </select>
+        </div>
+
+        <button id="startBtn" class="start-btn">START</button>
+    </div>
+</div>
