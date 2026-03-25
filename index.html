@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SONG, YOUNG MIN Guitar Lab - Motion Edition</title>
+    <title>SONG, YOUNG MIN Guitar Lab - Hybrid Edition</title>
     <style>
         :root {
             --navy: #1a2a6c;
@@ -15,83 +15,112 @@
             --shadow-in: inset 6px 6px 12px #bebebe, inset -6px -6px 12px #ffffff;
         }
 
-        body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
-        .app-card { background: var(--bg); width: 90%; max-width: 380px; padding: 20px; border-radius: 40px; box-shadow: var(--shadow-out); text-align: center; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        
+        /* 기본 카드 레이아웃 (세로형) */
+        .app-card { 
+            background: var(--bg); width: 90%; max-width: 380px; padding: 20px; border-radius: 40px; 
+            box-shadow: var(--shadow-out); text-align: center; display: flex; flex-direction: column; align-items: center; 
+            transition: all 0.3s ease;
+        }
+
+        /* [가로 모드 핵심 설정] */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .app-card {
+                max-width: 650px;
+                flex-direction: row; /* 좌우 배치 */
+                padding: 15px;
+                gap: 20px;
+                border-radius: 30px;
+            }
+            .side-left { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+            .side-right { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+            
+            .brand { margin-bottom: 5px; }
+            .display-area { height: 120px !important; margin-bottom: 5px; } /* 바늘 박스 확장 */
+            .bpm-display { font-size: 2.5rem !important; }
+            .start-btn { padding: 12px !important; font-size: 1.1rem !important; }
+            .btn { padding: 8px !important; font-size: 0.75rem !important; }
+            .adj-btn { width: 40px !important; height: 40px !important; font-size: 1.2rem !important; }
+        }
+
         .brand { font-size: 0.7rem; font-weight: 800; color: var(--navy); letter-spacing: 1.5px; margin-bottom: 12px; }
         .display-area { width: 100%; height: 85px; background: #1a1a1a; border-radius: 20px; position: relative; margin-bottom: 15px; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 5px 15px rgba(0,0,0,0.6); overflow: hidden; }
         
-        /* [핵심 수정 1] 바늘 스타일: 잔상 효과를 위한 속성 추가 */
         .needle { 
             width: 5px; height: 70px; background: var(--orange); position: absolute; bottom: 8px; border-radius: 2px; 
             transform-origin: bottom center; 
             transform: translateX(-50%) rotate(0deg);
-            /* filter 속성의 변화도 부드럽게 만들기 위해 transition에 추가 */
             transition: transform 0.08s ease-out, filter 0.08s ease-out; 
-            filter: blur(0px); /* 기본 상태는 선명하게 */
-            will-change: transform, filter; /* 브라우저 최적화 */
+            filter: blur(0px); will-change: transform, filter;
         }
-        
-        /* [핵심 수정 2] 바늘이 움직일 때 적용될 잔상 클래스 */
-        /* blur(1.5px)는 흐림 정도, opacity는 투명도입니다. 수치를 조절해 보세요. */
         .needle.moving { filter: blur(1.5px); opacity: 0.8; }
 
         .led-row { display: none; justify-content: center; gap: 12px; width: 90%; }
-        .led { width: 20px; height: 20px; background: #333; border-radius: 50%; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+        .led { width: 18px; height: 18px; background: #333; border-radius: 50%; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
         .led.active-normal { background: var(--green); box-shadow: 0 0 15px var(--green); }
         .led.active-accent { background: var(--orange); box-shadow: 0 0 15px var(--orange); }
-        .btn-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 12px; width: 100%; }
+
+        .btn-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; width: 100%; }
         .btn { padding: 12px; border: none; border-radius: 12px; background: var(--bg); color: var(--navy); cursor: pointer; font-size: 0.85rem; font-weight: 700; flex: 1; box-shadow: var(--shadow-out); transition: all 0.2s ease; }
         .btn:active { box-shadow: var(--shadow-in); transform: scale(0.96); }
         .btn-click { background: var(--orange); color: white; }
         .btn-click.on { background: var(--bg); color: var(--orange); box-shadow: var(--shadow-in); }
-        .slider-container { width: 100%; margin-bottom: 10px; }
-        .slider-label { font-size: 0.75rem; font-weight: 800; color: var(--navy); display: flex; justify-content: space-between; align-items: center; }
+
+        .slider-container { width: 100%; margin-bottom: 8px; }
+        .slider-label { font-size: 0.7rem; font-weight: 800; color: var(--navy); display: flex; justify-content: space-between; align-items: center; }
         .bpm-display { font-size: 3.2rem; font-weight: 900; color: var(--navy); margin: 0; }
         
-        input[type="range"] { width: 100%; height: 8px; border-radius: 4px; background: var(--bg); appearance: none; outline: none; margin: 10px 0; box-shadow: var(--shadow-in); }
-        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; background: var(--navy); border-radius: 50%; cursor: pointer; }
+        input[type="range"] { width: 100%; height: 6px; border-radius: 4px; background: var(--bg); appearance: none; outline: none; margin: 8px 0; box-shadow: var(--shadow-in); }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: var(--navy); border-radius: 50%; cursor: pointer; }
 
-        .start-btn { width: 100%; padding: 20px; border: none; border-radius: 22px; background: var(--navy); color: white; font-size: 1.4rem; font-weight: 800; cursor: pointer; margin-top: 5px; box-shadow: 5px 5px 12px rgba(0,0,0,0.2); transition: 0.3s; }
+        .start-btn { width: 100%; padding: 18px; border: none; border-radius: 22px; background: var(--navy); color: white; font-size: 1.3rem; font-weight: 800; cursor: pointer; margin-top: 5px; box-shadow: 5px 5px 12px rgba(0,0,0,0.2); transition: 0.3s; }
         .start-btn.running { background: var(--burgundy); box-shadow: var(--shadow-in); }
-        .adj-btn { flex: none; width: 50px; height: 50px; border-radius: 50%; font-size: 1.5rem; }
+        .adj-btn { flex: none; width: 48px; height: 48px; border-radius: 50%; font-size: 1.4rem; }
     </style>
 </head>
 <body>
 
 <div class="app-card">
-    <div class="brand">SONG, YOUNG MIN GUITAR LAB</div>
-    <div class="btn-row">
-        <button id="btnAnalog" class="btn active" style="box-shadow: var(--shadow-in); color: var(--orange);">ANALOG</button>
-        <button id="btnDigital" class="btn">DIGITAL</button>
-    </div>
-    <div class="display-area">
-        <div id="analog-view" style="width:100%; display:flex; justify-content:center;"><div class="needle" id="needle"></div></div>
-        <div id="digital-view" class="led-row"></div>
-    </div>
-    <div class="slider-container">
-        <div class="slider-label">
-            <button class="btn adj-btn" id="tMinus">-</button>
-            <span>BPM TEMPO</span>
-            <button class="btn adj-btn" id="tPlus">+</button>
+    <div class="side-left">
+        <div class="brand">SONG, YOUNG MIN GUITAR LAB</div>
+        <div class="btn-row">
+            <button id="btnAnalog" class="btn active" style="box-shadow: var(--shadow-in); color: var(--orange);">ANALOG</button>
+            <button id="btnDigital" class="btn">DIGITAL</button>
         </div>
-        <div class="bpm-display" id="mainBpm">120</div>
-        <input type="range" id="tempoRange" min="28" max="365" value="120">
+        <div class="display-area">
+            <div id="analog-view" style="width:100%; display:flex; justify-content:center;"><div class="needle" id="needle"></div></div>
+            <div id="digital-view" class="led-row"></div>
+        </div>
+        <div class="btn-row"><button id="clickToggle" class="btn btn-click">CLICK (Same Sound)</button></div>
     </div>
-    <div class="slider-container">
-        <div class="slider-label">VOLUME</div>
-        <input type="range" id="volRange" min="0" max="100" value="80">
+
+    <div class="side-right">
+        <div class="slider-container">
+            <div class="slider-label">
+                <button class="btn adj-btn" id="tMinus">-</button>
+                <span>BPM TEMPO</span>
+                <button class="btn adj-btn" id="tPlus">+</button>
+            </div>
+            <div class="bpm-display" id="mainBpm">120</div>
+            <input type="range" id="tempoRange" min="28" max="365" value="120">
+        </div>
+        <div class="slider-container">
+            <div class="slider-label">VOLUME</div>
+            <input type="range" id="volRange" min="0" max="100" value="80">
+        </div>
+        <div class="btn-row" id="timeBtns">
+            <button class="btn" data-val="2">2/4</button>
+            <button class="btn" data-val="3">3/4</button>
+            <button class="btn" data-val="4" id="defaultTime">4/4</button>
+            <button class="btn" data-val="6">6/8</button>
+        </div>
+        <button id="startBtn" class="start-btn">START</button>
     </div>
-    <div class="btn-row" id="timeBtns">
-        <button class="btn" data-val="2">2/4</button>
-        <button class="btn" data-val="3">3/4</button>
-        <button class="btn" data-val="4" id="defaultTime">4/4</button>
-        <button class="btn" data-val="6">6/8</button>
-    </div>
-    <div class="btn-row"><button id="clickToggle" class="btn btn-click">CLICK (Same Sound)</button></div>
-    <button id="startBtn" class="start-btn">START</button>
 </div>
 
 <script>
+    /* 기존 자바스크립트 로직 그대로 유지 */
     let audioCtx = null, isPlaying = false, bpm = 120, measure = 4, currentTick = 0, nextTickTime = 0, timerID = null, isSameSound = false, currentMode = 'analog';
     const needle = document.getElementById('needle'), startBtn = document.getElementById('startBtn'), mainBpm = document.getElementById('mainBpm'), tempoRange = document.getElementById('tempoRange'), digitalView = document.getElementById('digital-view'), clickToggle = document.getElementById('clickToggle');
 
@@ -99,6 +128,7 @@
     function createLEDs(count) { digitalView.innerHTML = ''; for (let i = 0; i < count; i++) { const led = document.createElement('div'); led.className = 'led'; digitalView.appendChild(led); } }
 
     function playSound(time, tickIndex) {
+        if(!audioCtx) return;
         const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
         const isFirst = (tickIndex % measure) === 0;
         osc.frequency.value = (isFirst && !isSameSound) ? 2350 : 1300;
@@ -111,25 +141,13 @@
         setTimeout(() => updateVisuals(tickIndex % measure, isFirst), delay);
     }
 
-    /* [핵심 수정 3] 자바스크립트 시각화 부분: 바늘 움직임에 잔상 클래스(moving) 추가/제거 */
     function updateVisuals(beatIndex, isAccent) {
         if (currentMode === 'analog') {
-            // 강박/약박 색상 변경 로직
             needle.style.background = (isAccent && !isSameSound) ? 'var(--green)' : 'var(--orange)';
-            
-            // 1. 잔상 효과 활성화 (moving 클래스 추가)
             needle.classList.add('moving');
-            
-            // 바늘 회전 실행
             const angle = (currentTick % 2 === 0) ? -35 : 35;
             needle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-
-            // 2. 일정 시간 뒤 잔상 제거 (다음 박자 전까지 선명하게 복구)
-            // 템포가 빠를수록 잔상이 더 역동적으로 보입니다.
-            setTimeout(() => {
-                needle.classList.remove('moving');
-            }, 50); // 0.05초 후에 흐림 효과 제거
-
+            setTimeout(() => { needle.classList.remove('moving'); }, 50);
         } else {
             const leds = document.querySelectorAll('.led');
             leds.forEach((l, idx) => { l.className = 'led'; if (idx === beatIndex) l.classList.add((idx === 0 && !isSameSound) ? 'active-accent' : 'active-normal'); });
@@ -159,7 +177,7 @@
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         isPlaying = !isPlaying;
         if (isPlaying) { currentTick = 0; nextTickTime = audioCtx.currentTime; scheduler(); startBtn.innerText = 'STOP'; startBtn.classList.add('running'); } 
-        else { cancelAnimationFrame(timerID); startBtn.innerText = 'START'; startBtn.classList.remove('running'); document.querySelectorAll('.led').forEach(l => l.className = 'led'); needle.style.background = 'var(--orange)'; needle.style.transform = `translateX(-50%) rotate(0deg)`; needle.classList.remove('moving'); /* 정지 시 잔상 제거 */ }
+        else { cancelAnimationFrame(timerID); startBtn.innerText = 'START'; startBtn.classList.remove('running'); document.querySelectorAll('.led').forEach(l => l.className = 'led'); needle.style.background = 'var(--orange)'; needle.style.transform = `translateX(-50%) rotate(0deg)`; needle.classList.remove('moving'); }
     };
     init();
 </script>
