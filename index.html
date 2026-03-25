@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SONG, YOUNG MIN Guitar Lab - Professional</title>
+    <title>SONG, YOUNG MIN Guitar Lab - Premium</title>
     <style>
         :root {
             --navy: #1a2a6c;
-            --orange: #ff9800; /* Click 버튼용 주황색 */
-            --bg: #f4f7f6;
+            --orange: #ff9800;
+            --bg: #e0e5ec; /* 입체감을 위한 배경색 */
             --white: #ffffff;
-            --led-off: #333;
-            --led-on: #2ecc71;
+            --shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5);
+            --inner-shadow: inset 6px 6px 12px #c1c9d7, inset -6px -6px 12px #ffffff;
         }
 
         body { 
@@ -20,46 +20,63 @@
             margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; 
         }
 
+        /* 메인 카드: 입체감 있는 블록 형태 */
         .app-card { 
-            background: var(--white); width: 95%; max-width: 450px; padding: 20px; 
-            border-radius: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); text-align: center;
+            background: var(--bg); width: 92%; max-width: 420px; padding: 30px; 
+            border-radius: 40px; box-shadow: var(--shadow); text-align: center;
         }
 
-        .brand { font-size: 0.7rem; font-weight: bold; color: var(--navy); letter-spacing: 2px; margin-bottom: 15px; }
+        .brand { font-size: 0.75rem; font-weight: 800; color: var(--navy); letter-spacing: 1.5px; margin-bottom: 20px; opacity: 0.7; }
 
-        /* --- 인터페이스 전환 영역 --- */
-        .display-area { width: 100%; height: 120px; background: #222; border-radius: 15px; position: relative; margin-bottom: 15px; display: flex; justify-content: center; align-items: center; }
+        /* 시각화 영역: 안으로 파여 있는 느낌 */
+        .display-area { 
+            width: 100%; height: 110px; background: #222; border-radius: 20px; 
+            position: relative; margin-bottom: 25px; display: flex; justify-content: center; 
+            align-items: center; box-shadow: inset 0 5px 15px rgba(0,0,0,0.5);
+        }
         
-        /* 아날로그 모드 (바늘) */
         #analog-view { width: 100%; height: 100%; position: relative; display: flex; justify-content: center; }
-        .needle { width: 3px; height: 80px; background: var(--orange); position: absolute; bottom: 10px; transform-origin: bottom center; transition: transform 0.1s ease-out; }
+        .needle { width: 4px; height: 75px; background: var(--orange); position: absolute; bottom: 10px; border-radius: 2px; transform-origin: bottom center; transition: transform 0.1s ease-out; }
 
-        /* 디지털 모드 (LED) */
-        #digital-view { width: 100%; display: none; justify-content: center; gap: 15px; }
-        .led { width: 30px; height: 30px; background: var(--led-off); border-radius: 50%; box-shadow: inset 0 0 5px #000; }
-        .led.active { background: var(--led-on); box-shadow: 0 0 15px var(--led-on); }
+        #digital-view { width: 100%; display: none; justify-content: center; gap: 20px; }
+        .led { width: 25px; height: 25px; background: #333; border-radius: 50%; transition: 0.1s; }
+        .led.active { background: #00ff88; box-shadow: 0 0 20px #00ff88; }
 
-        /* --- 버튼 및 컨트롤 --- */
-        .bpm-display { font-size: 3.5rem; font-weight: 900; color: var(--navy); margin: 0; }
-        .label { font-size: 0.7rem; color: #888; margin: 10px 0 5px; font-weight: bold; text-transform: uppercase; }
-
-        .btn-row { display: flex; justify-content: center; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+        /* 버튼 스타일: 눌리는 물리적 느낌 구현 */
+        .btn-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
         .btn { 
-            padding: 8px 10px; border: 1.5px solid #eee; border-radius: 8px; background: #fff; 
-            color: var(--navy); cursor: pointer; font-size: 0.75rem; font-weight: 600; flex: 1; min-width: 60px;
+            padding: 12px; border: none; border-radius: 12px; background: var(--bg); 
+            color: var(--navy); cursor: pointer; font-size: 0.85rem; font-weight: 700; 
+            flex: 1; min-width: 60px; box-shadow: var(--shadow); transition: 0.2s;
         }
-        .btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+        .btn:active { box-shadow: var(--inner-shadow); transform: scale(0.98); }
+        .btn.active { box-shadow: var(--inner-shadow); color: var(--orange); }
 
-        /* Click(강박제어) 버튼 - 주황색 */
-        .btn-click { background: #fff; border: 2px solid var(--orange); color: var(--orange); }
-        .btn-click.on { background: var(--orange); color: white; }
+        /* 모드 전환 버튼 전용 */
+        .mode-btn { border-radius: 20px; font-size: 0.7rem; padding: 8px 15px; margin: 0 5px 20px; }
 
-        /* 모드 전환 버튼 (아날로그/디지털) */
-        .mode-btn { background: #eee; border: none; padding: 10px 20px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; margin: 0 5px; }
-        .mode-btn.active { background: var(--navy); color: white; }
+        /* CLICK 버튼: 주황색 강조 */
+        .btn-click { color: var(--orange); }
+        .btn-click.on { background: var(--orange); color: white; box-shadow: inset 4px 4px 8px #c57600, inset -4px -4px 8px #ffba4d; }
 
-        input[type="range"] { width: 100%; accent-color: var(--navy); margin: 10px 0; }
-        .start-btn { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--navy); color: white; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        /* 슬라이더 라벨 및 디자인 */
+        .slider-container { width: 100%; margin-bottom: 20px; text-align: left; }
+        .slider-label { font-size: 0.8rem; font-weight: 800; color: var(--navy); margin-left: 5px; display: flex; justify-content: space-between; }
+        .bpm-display { font-size: 3.5rem; font-weight: 900; color: var(--navy); text-align: center; margin: 10px 0; text-shadow: 2px 2px 5px rgba(0,0,0,0.05); }
+
+        input[type="range"] { 
+            width: 100%; height: 10px; border-radius: 5px; background: var(--bg); 
+            box-shadow: var(--inner-shadow); appearance: none; outline: none; margin: 12px 0;
+        }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: var(--navy); border-radius: 50%; cursor: pointer; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); }
+
+        /* 시작 버튼 */
+        .start-btn { 
+            width: 100%; padding: 20px; border: none; border-radius: 20px; 
+            background: var(--navy); color: white; font-size: 1.3rem; font-weight: 800; 
+            cursor: pointer; margin-top: 10px; box-shadow: 5px 5px 15px rgba(26, 42, 108, 0.4); transition: 0.2s;
+        }
+        .start-btn:active { transform: scale(0.97); box-shadow: 2px 2px 5px rgba(26, 42, 108, 0.4); }
     </style>
 </head>
 <body>
@@ -67,9 +84,9 @@
 <div class="app-card">
     <div class="brand">SONG, YOUNG MIN GUITAR LAB</div>
 
-    <div style="margin-bottom: 15px;">
-        <button id="btnAnalog" class="mode-btn active">ANALOG</button>
-        <button id="btnDigital" class="mode-btn">DIGITAL</button>
+    <div class="btn-row">
+        <button id="btnAnalog" class="btn mode-btn active">ANALOG</button>
+        <button id="btnDigital" class="btn mode-btn">DIGITAL</button>
     </div>
 
     <div class="display-area">
@@ -84,28 +101,27 @@
         </div>
     </div>
 
-    <div class="bpm-display" id="bpmTxt">120</div>
-    <input type="range" id="tempoRange" min="40" max="250" value="120">
-    <input type="range" id="volRange" min="0" max="100" value="80">
+    <div class="slider-container">
+        <div class="slider-label"><span>TEMPO</span> <span id="bpmTxt">120</span></div>
+        <input type="range" id="tempoRange" min="40" max="250" value="120">
+        <div class="bpm-display" id="mainBpm">120</div>
+    </div>
 
-    <div class="label">Time Signature</div>
+    <div class="slider-container">
+        <div class="slider-label"><span>VOLUME</span></div>
+        <input type="range" id="volRange" min="0" max="100" value="80">
+    </div>
+
+    <div class="slider-label" style="margin-bottom: 10px;">TIME SIGNATURE</div>
     <div class="btn-row" id="timeBtns">
-        <button class="btn" data-val="1">1/2</button>
+        <button class="btn" data-val="2">2/4</button>
         <button class="btn" data-val="3">3/4</button>
         <button class="btn active" data-val="4">4/4</button>
         <button class="btn" data-val="6">6/8</button>
-        <button class="btn" data-val="12">12/8</button>
     </div>
 
-    <div class="label">Accent & Subdivision</div>
     <div class="btn-row">
         <button id="clickToggle" class="btn btn-click">CLICK (Same Sound)</button>
-    </div>
-    <div class="btn-row" id="subBtns">
-        <button class="btn active" data-val="1">4분</button>
-        <button class="btn" data-val="2">8분</button>
-        <button class="btn" data-val="3">3연음</button>
-        <button class="btn" data-val="4">16분</button>
     </div>
 
     <button id="startBtn" class="start-btn">START</button>
@@ -117,26 +133,26 @@
     let isPlaying = false;
     let bpm = 120;
     let measure = 4;
-    let subdivision = 1;
     let currentTick = 0;
     let nextTickTime = 0;
     let timerID = null;
-    let isSameSound = false; // Click 버튼 상태 (True면 모든 박 소리 동일)
-    let currentMode = 'analog'; // 'analog' 또는 'digital'
+    let isSameSound = false; 
+    let currentMode = 'analog';
 
     const needle = document.getElementById('needle');
     const startBtn = document.getElementById('startBtn');
+    const mainBpm = document.getElementById('mainBpm');
     const bpmTxt = document.getElementById('bpmTxt');
 
-    /* --- 소리 생성 로직 --- */
+    /* --- 소리 생성 및 재생 로직 --- */
     function playSound(time, tickIndex) {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         
-        // 강박 위치 계산: (전체 마디의 첫 박자)
-        const isFirstBeat = (tickIndex % (measure * subdivision)) === 0;
+        // 마디의 첫 박자 확인 (서브디비전 제거로 로직 단순화)
+        const isFirstBeat = (tickIndex % measure) === 0;
 
-        // 로직: isSameSound가 true면 무조건 800Hz, false면 첫박만 1200Hz
+        // 동일 소리 모드 체크
         osc.frequency.value = (isFirstBeat && !isSameSound) ? 1200 : 800;
         
         const vol = document.getElementById('volRange').value / 100;
@@ -150,22 +166,19 @@
 
         // 시각화 업데이트 스케줄링
         const delay = (time - audioCtx.currentTime) * 1000;
-        setTimeout(() => {
-            updateVisuals(tickIndex % (measure * subdivision));
-        }, delay);
+        setTimeout(() => updateVisuals(tickIndex % measure), delay);
     }
 
-    /* --- 인터페이스 업데이트 로직 --- */
+    /* --- 시각화 업데이트 --- */
     function updateVisuals(beatInMeasure) {
         if (currentMode === 'analog') {
-            // 바늘침 좌우 이동
             const angle = (currentTick % 2 === 0) ? -35 : 35;
             needle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
         } else {
-            // LED 업데이트: 4/4 박자 등 분할에 맞춰 해당 LED 점등
-            const ledIndex = Math.floor(beatInMeasure / subdivision) % 4; 
-            document.querySelectorAll('.led').forEach((l, idx) => {
-                l.classList.toggle('active', idx === ledIndex);
+            // 디지털 LED 로직: 현재 박자에 맞게 깜빡임
+            const leds = document.querySelectorAll('.led');
+            leds.forEach((l, idx) => {
+                l.classList.toggle('active', idx === (beatInMeasure % 4)); 
             });
         }
     }
@@ -174,7 +187,7 @@
     function scheduler() {
         while (nextTickTime < audioCtx.currentTime + 0.1) {
             playSound(nextTickTime, currentTick);
-            nextTickTime += (60.0 / bpm / subdivision);
+            nextTickTime += (60.0 / bpm);
             currentTick++;
         }
         timerID = requestAnimationFrame(scheduler);
@@ -182,48 +195,47 @@
 
     /* --- 이벤트 리스너 --- */
 
-    // 1. 모드 전환 (아날로그 <-> 디지털)
-    document.getElementById('btnAnalog').addEventListener('click', () => {
+    // 1. 아날로그/디지털 모드 전환
+    document.getElementById('btnAnalog').addEventListener('click', function() {
         currentMode = 'analog';
         document.getElementById('analog-view').style.display = 'flex';
         document.getElementById('digital-view').style.display = 'none';
-        document.getElementById('btnAnalog').classList.add('active');
+        this.classList.add('active');
         document.getElementById('btnDigital').classList.remove('active');
     });
 
-    document.getElementById('btnDigital').addEventListener('click', () => {
+    document.getElementById('btnDigital').addEventListener('click', function() {
         currentMode = 'digital';
         document.getElementById('analog-view').style.display = 'none';
         document.getElementById('digital-view').style.display = 'flex';
-        document.getElementById('btnDigital').classList.add('active');
+        this.classList.add('active');
         document.getElementById('btnAnalog').classList.remove('active');
     });
 
-    // 2. Click (강박 제어) 버튼
+    // 2. Click (강박 제어)
     const clickToggle = document.getElementById('clickToggle');
-    clickToggle.addEventListener('click', () => {
+    clickToggle.addEventListener('click', function() {
         isSameSound = !isSameSound;
-        clickToggle.classList.toggle('on', isSameSound);
+        this.classList.toggle('on', isSameSound);
     });
 
-    // 3. 박자 및 분할 버튼 공통 설정
-    function setBtnGroup(groupId, callback) {
-        const btns = document.querySelectorAll(`#${groupId} .btn`);
-        btns.forEach(b => b.addEventListener('click', () => {
-            document.querySelector(`#${groupId} .active`).classList.remove('active');
-            b.classList.add('active');
-            callback(b.dataset.val);
-        }));
-    }
-    setBtnGroup('timeBtns', v => measure = parseInt(v));
-    setBtnGroup('subBtns', v => subdivision = parseInt(val = v));
+    // 3. 타임 시그니처 버튼 (단일 관리로 오류 방지)
+    const timeBtns = document.querySelectorAll('#timeBtns .btn');
+    timeBtns.forEach(b => b.addEventListener('click', function() {
+        document.querySelector('#timeBtns .active').classList.remove('active');
+        this.classList.add('active');
+        measure = parseInt(this.dataset.val);
+        currentTick = 0; // 박자 변경 시 카운트 초기화
+    }));
 
-    // 4. 기타 컨트롤
+    // 4. 슬라이더 컨트롤
     document.getElementById('tempoRange').addEventListener('input', (e) => {
         bpm = e.target.value;
         bpmTxt.innerText = bpm;
+        mainBpm.innerText = bpm;
     });
 
+    // 5. 시작 버튼
     startBtn.addEventListener('click', () => {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         isPlaying = !isPlaying;
