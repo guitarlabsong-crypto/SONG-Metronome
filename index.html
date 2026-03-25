@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SONG, YOUNG MIN Guitar Lab - Premium v2</title>
+    <title>SONG, YOUNG MIN Guitar Lab - Final Edition</title>
     <style>
         :root {
             --navy: #1a2a6c;
             --orange: #ff9800;
-            --bg: #ebedef; /* 입체감을 살리는 밝은 회색 배경 */
-            --white: #ffffff;
-            /* 더 깊고 뚜렷한 그림자 설정 */
+            --green: #00e676;
+            --bg: #ebedef;
             --shadow-out: 8px 8px 15px #bebebe, -8px -8px 15px #ffffff;
             --shadow-in: inset 6px 6px 12px #bebebe, inset -6px -6px 12px #ffffff;
         }
@@ -19,63 +18,61 @@
             font-family: 'Pretendard', sans-serif; 
             background: var(--bg); 
             margin: 0; display: flex; justify-content: center; align-items: center; 
-            height: 100vh; overflow: hidden; /* 상하 여백 없이 꽉 차게 배치 */
+            height: 100vh; overflow: hidden; 
         }
 
         .app-card { 
             background: var(--bg); width: 90%; max-width: 400px; 
-            padding: 20px 25px; /* 상하 패딩을 줄여 압축 */
+            padding: 15px 25px; 
             border-radius: 40px; box-shadow: var(--shadow-out); text-align: center;
             display: flex; flex-direction: column; align-items: center;
         }
 
-        .brand { font-size: 0.7rem; font-weight: 800; color: var(--navy); letter-spacing: 1px; margin-bottom: 15px; opacity: 0.8; }
+        .brand { font-size: 0.7rem; font-weight: 800; color: var(--navy); letter-spacing: 1px; margin-bottom: 10px; opacity: 0.8; }
 
-        /* 시각화 영역 */
+        /* 시각화 영역: 배경은 항상 검정 계열 */
         .display-area { 
-            width: 100%; height: 90px; background: #222; border-radius: 20px; 
+            width: 100%; height: 80px; background: #1a1a1a; border-radius: 20px; 
             position: relative; margin-bottom: 15px; display: flex; justify-content: center; 
             align-items: center; box-shadow: inset 0 5px 15px rgba(0,0,0,0.4);
         }
         
-        .needle { width: 4px; height: 65px; background: var(--orange); position: absolute; bottom: 8px; border-radius: 2px; transform-origin: bottom center; transition: transform 0.08s ease-out; }
+        /* 바늘침: 기본 오렌지색 */
+        .needle { width: 4px; height: 60px; background: var(--orange); position: absolute; bottom: 8px; border-radius: 2px; transform-origin: bottom center; transition: transform 0.08s ease-out, background 0.1s; }
 
-        .led-row { display: none; justify-content: center; gap: 15px; width: 100%; }
-        .led { width: 22px; height: 22px; background: #333; border-radius: 50%; }
-        .led.active { background: #00ff88; box-shadow: 0 0 15px #00ff88; }
+        /* LED 컨테이너: 박자표에 따라 내부 LED가 동적으로 생성됨 */
+        .led-row { display: none; justify-content: center; gap: 10px; width: 90%; flex-wrap: wrap; }
+        .led { width: 18px; height: 18px; background: #333; border-radius: 50%; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); transition: 0.1s; }
+        /* 일반박: 초록색 / 강박: 주황색 */
+        .led.active-normal { background: var(--green); box-shadow: 0 0 15px var(--green); }
+        .led.active-accent { background: var(--orange); box-shadow: 0 0 15px var(--orange); }
 
-        /* 버튼: 그림자 대비를 높여 입체감 강화 */
-        .btn-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; width: 100%; }
+        .btn-row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; width: 100%; }
         .btn { 
             padding: 10px; border: none; border-radius: 12px; background: var(--bg); 
             color: var(--navy); cursor: pointer; font-size: 0.8rem; font-weight: 700; 
             flex: 1; min-width: 55px; box-shadow: var(--shadow-out); transition: 0.1s;
         }
-        /* 눌렸을 때 효과 극대화 */
         .btn:active { box-shadow: var(--shadow-in); transform: scale(0.96); }
         .btn.active { box-shadow: var(--shadow-in); color: var(--orange); }
 
-        /* 미세조정 버튼 전용 */
-        .adj-btn { flex: none; width: 35px; height: 35px; border-radius: 50%; font-size: 1.1rem; padding: 0; }
+        .adj-btn { flex: none; width: 35px; height: 35px; border-radius: 50%; font-size: 1.1rem; }
 
-        /* 슬라이더 영역 간격 축소 */
-        .slider-container { width: 100%; margin-bottom: 10px; }
-        .slider-label { font-size: 0.75rem; font-weight: 800; color: var(--navy); margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
-        .bpm-display { font-size: 3rem; font-weight: 900; color: var(--navy); margin: 2px 0; }
+        .slider-container { width: 100%; margin-bottom: 8px; }
+        .slider-label { font-size: 0.75rem; font-weight: 800; color: var(--navy); margin-bottom: 3px; display: flex; justify-content: space-between; align-items: center; }
+        .bpm-display { font-size: 2.8rem; font-weight: 900; color: var(--navy); margin: 0; }
 
         input[type="range"] { 
             width: 100%; height: 8px; border-radius: 4px; background: var(--bg); 
             appearance: none; outline: none; margin: 8px 0; box-shadow: var(--shadow-in);
         }
-        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 20px; height: 20px; background: var(--navy); border-radius: 50%; cursor: pointer; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; background: var(--navy); border-radius: 50%; cursor: pointer; }
 
-        /* 시작 버튼 */
         .start-btn { 
-            width: 100%; padding: 18px; border: none; border-radius: 20px; 
+            width: 100%; padding: 15px; border: none; border-radius: 20px; 
             background: var(--navy); color: white; font-size: 1.2rem; font-weight: 800; 
-            cursor: pointer; margin-top: 5px; box-shadow: 4px 4px 10px rgba(26, 42, 108, 0.3); transition: 0.2s;
+            cursor: pointer; margin-top: 5px; box-shadow: 4px 4px 10px rgba(26, 42, 108, 0.3);
         }
-        .start-btn:active { box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5); transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -93,17 +90,13 @@
             <div class="needle" id="needle"></div>
         </div>
         <div id="digital-view" class="led-row">
-            <div class="led" id="led0"></div>
-            <div class="led" id="led1"></div>
-            <div class="led" id="led2"></div>
-            <div class="led" id="led3"></div>
-        </div>
+            </div>
     </div>
 
     <div class="slider-container">
         <div class="slider-label">
             <button class="btn adj-btn" id="tMinus">-</button>
-            <span>TEMPO</span>
+            <span>TEMPO (BPM)</span>
             <button class="btn adj-btn" id="tPlus">+</button>
         </div>
         <div class="bpm-display" id="mainBpm">120</div>
@@ -130,105 +123,135 @@
 </div>
 
 <script>
-    let audioCtx = null;
-    let isPlaying = false;
-    let bpm = 120;
-    let measure = 4;
-    let currentTick = 0;
-    let nextTickTime = 0;
-    let timerID = null;
-    let isSameSound = false; 
-    let currentMode = 'analog';
+    /* --- 기초 변수 설정 --- */
+    let audioCtx = null;       // 웹 오디오 엔진
+    let isPlaying = false;     // 재생 상태
+    let bpm = 120;             // 현재 템포
+    let measure = 4;           // 마디당 박자 (2, 3, 4, 6 등)
+    let currentTick = 0;       // 전체 틱 카운트
+    let nextTickTime = 0;      // 다음 소리 날 시간 예약
+    let timerID = null;        // 루프 타이머
+    let isSameSound = false;   // 강박 강조 사용 여부
+    let currentMode = 'analog';// 현재 UI 모드 (analog / digital)
 
     const needle = document.getElementById('needle');
     const startBtn = document.getElementById('startBtn');
     const mainBpm = document.getElementById('mainBpm');
     const tempoRange = document.getElementById('tempoRange');
+    const digitalView = document.getElementById('digital-view');
 
-    /* --- 고음 클릭 소리 로직 --- */
+    /* --- LED 동적 생성 함수: 박자표가 바뀔 때 실행됨 --- */
+    function createLEDs(count) {
+        digitalView.innerHTML = ''; // 기존 LED 삭제
+        for (let i = 0; i < count; i++) {
+            const led = document.createElement('div');
+            led.className = 'led'; // LED 클래스 부여
+            led.id = `led-${i}`;   // 개별 ID 부여
+            digitalView.appendChild(led);
+        }
+    }
+    createLEDs(4); // 초기 실행 시 4/4박자용 4개 생성
+
+    /* --- 소리 재생 및 시각화 동기화 로직 --- */
     function playSound(time, tickIndex) {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        const isFirstBeat = (tickIndex % measure) === 0;
+        const isFirstBeat = (tickIndex % measure) === 0; // 마디의 첫 박인지 확인
 
+        // 주파수 설정 (강박: 2200Hz, 약박: 1300Hz)
         osc.frequency.value = (isFirstBeat && !isSameSound) ? 2200 : 1300;
-        osc.type = 'sine'; // 깔끔한 고음을 위해 다시 사인파로 설정
         
         const vol = document.getElementById('volRange').value / 100;
         gain.gain.setValueAtTime(vol, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04); // 짧고 굵게 끊기는 소리
 
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start(time);
         osc.stop(time + 0.04);
 
+        // 시각화 지연 실행 (오디오 시간과 브라우저 렌더링 시간 동기화)
         const delay = (time - audioCtx.currentTime) * 1000;
-        setTimeout(() => updateVisuals(tickIndex % measure), delay);
+        setTimeout(() => updateVisuals(tickIndex % measure, isFirstBeat), delay);
     }
 
-    function updateVisuals(beatInMeasure) {
+    /* --- 시각화 업데이트 (LED 색상 및 바늘침 색상 변경) --- */
+    function updateVisuals(beatIndex, isAccent) {
         if (currentMode === 'analog') {
-            const angle = (currentTick % 2 === 0) ? -35 : 35;
+            // 아날로그 모드: 강박일 때 바늘침 색상을 초록색으로 변경, 아니면 오렌지색
+            needle.style.background = (isAccent && !isSameSound) ? 'var(--green)' : 'var(--orange)';
+            const angle = (currentTick % 2 === 0) ? -35 : 35; // 좌우 흔들림
             needle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
         } else {
+            // 디지털 모드: 모든 LED를 끄고 현재 박자만 켬
             const leds = document.querySelectorAll('.led');
             leds.forEach((l, idx) => {
-                l.classList.toggle('active', idx === (beatInMeasure % 4)); 
+                l.className = 'led'; // 클래스 초기화
+                if (idx === beatIndex) {
+                    // 강박 위치이고 SameSound 옵션이 꺼져있으면 주황색, 아니면 초록색
+                    l.classList.add((idx === 0 && !isSameSound) ? 'active-accent' : 'active-normal');
+                }
             });
         }
     }
 
+    /* --- 스케줄러 루프 --- */
     function scheduler() {
         while (nextTickTime < audioCtx.currentTime + 0.1) {
             playSound(nextTickTime, currentTick);
-            nextTickTime += (60.0 / bpm);
+            nextTickTime += (60.0 / bpm); // 다음 박자 시간 누적
             currentTick++;
         }
         timerID = requestAnimationFrame(scheduler);
     }
 
-    /* --- 템포 업데이트 함수 --- */
+    /* --- 템포 업데이트 컨트롤 --- */
     function updateBpm(val) {
-        bpm = Math.min(Math.max(val, 40), 250);
+        bpm = Math.min(Math.max(val, 40), 250); // 최소 40, 최대 250 제한
         tempoRange.value = bpm;
         mainBpm.innerText = bpm;
     }
 
-    document.getElementById('tMinus').onclick = () => updateBpm(parseInt(bpm) - 1);
-    document.getElementById('tPlus').onclick = () => updateBpm(parseInt(bpm) + 1);
-    tempoRange.oninput = (e) => updateBpm(e.target.value);
+    document.getElementById('tMinus').onclick = () => updateBpm(parseInt(bpm) - 1); // 1씩 감소
+    document.getElementById('tPlus').onclick = () => updateBpm(parseInt(bpm) + 1);  // 1씩 증가
+    tempoRange.oninput = (e) => updateBpm(e.target.value); // 슬라이더 조절
 
-    /* --- 모드 및 버튼 이벤트 --- */
+    /* --- 버튼 이벤트 설정 --- */
+    // 아날로그 모드로 변경
     document.getElementById('btnAnalog').onclick = function() {
         currentMode = 'analog';
         document.getElementById('analog-view').style.display = 'flex';
-        document.getElementById('digital-view').style.display = 'none';
+        digitalView.style.display = 'none';
         this.classList.add('active');
         document.getElementById('btnDigital').classList.remove('active');
     };
 
+    // 디지털 모드로 변경
     document.getElementById('btnDigital').onclick = function() {
         currentMode = 'digital';
         document.getElementById('analog-view').style.display = 'none';
-        document.getElementById('digital-view').style.display = 'flex';
+        digitalView.style.display = 'flex';
         this.classList.add('active');
         document.getElementById('btnAnalog').classList.remove('active');
     };
 
+    // 강박 제어 버튼
     document.getElementById('clickToggle').onclick = function() {
         isSameSound = !isSameSound;
         this.classList.toggle('active', isSameSound);
     };
 
+    // 박자표 버튼 클릭 시 LED 개수 다시 생성
     const tBtns = document.querySelectorAll('#timeBtns .btn');
     tBtns.forEach(b => b.onclick = function() {
         document.querySelector('#timeBtns .active').classList.remove('active');
         this.classList.add('active');
-        measure = parseInt(this.dataset.val);
-        currentTick = 0;
+        measure = parseInt(this.dataset.val); // 박자수 업데이트 (2, 3, 4, 6)
+        createLEDs(measure); // LED 개수 즉시 변경
+        currentTick = 0; // 박자 초기화
     });
 
+    // 시작/중지 버튼
     startBtn.onclick = () => {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         isPlaying = !isPlaying;
@@ -240,7 +263,8 @@
         } else {
             cancelAnimationFrame(timerID);
             startBtn.innerText = 'START';
-            document.querySelectorAll('.led').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.led').forEach(l => l.className = 'led');
+            needle.style.background = 'var(--orange)';
             needle.style.transform = `translateX(-50%) rotate(0deg)`;
         }
     };
