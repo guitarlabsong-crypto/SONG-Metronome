@@ -90,7 +90,7 @@
 <body>
 
 <div class="app-card">
-    <div class="brand">SONG, YOUNG MIN GUITAR LAB</div>
+    <div class="brand">SONG,YOUNG MIN GUITAR LAB</div>
 
     <div class="btn-row">
         <button id="btnAnalog" class="btn active" style="box-shadow: var(--shadow-in); color: var(--orange);">ANALOG</button>
@@ -177,7 +177,7 @@
         const isFirst = (tickIndex % measure) === 0;
 
         // 강박 2200Hz, 약박 1300Hz (날카로운 고음)
-        osc.frequency.value = (isFirst && !isSameSound) ? 2400 : 1300;
+        osc.frequency.value = (isFirst && !isSameSound) ? 2400 : 1400;
         
         const vol = document.getElementById('volRange').value / 100;
         gain.gain.setValueAtTime(vol, time);
