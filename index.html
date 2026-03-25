@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SONG,YOUNG-MIN Guitar Lab-Metronome Edition</title>
+    <title>SONG,YOUNG-MIN Guitar Lab - Metronome Edition</title>
     <style>
         :root {
             --navy: #1a2a6c;
@@ -113,7 +113,7 @@
                 <button class="btn adj-btn" id="tPlus">+</button>
             </div>
             <div class="bpm-display" id="mainBpm">120</div>
-            <input type="range" id="tempoRange" min="28" max="365" value="120">
+            <input type="range" id="tempoRange" min="28" max="250" value="120">
         </div>
         <div class="slider-container">
             <div class="slider-label">VOLUME</div>
@@ -190,7 +190,7 @@
     function scheduler() { while (nextTickTime < audioCtx.currentTime + 0.1) { playSound(nextTickTime, currentTick); nextTickTime += (60.0 / bpm); currentTick++; } timerID = requestAnimationFrame(scheduler); }
 
     function updateBpm(val) {
-        bpm = Math.min(Math.max(parseInt(val), 28), 365);
+        bpm = Math.min(Math.max(parseInt(val), 28), 250);
         tempoRange.value = bpm;
         mainBpm.innerText = bpm;
     }
