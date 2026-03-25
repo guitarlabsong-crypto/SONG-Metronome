@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SONG,YOUNG MIN Guitar Lab - Master Pro</title>
+    <title>SONG,YOUNG MIN Guitar Lab - Perfect Alignment</title>
     <style>
         :root {
             --navy: #1a2a6c;
@@ -16,13 +16,7 @@
             --shadow-in: inset 6px 6px 12px #bebebe, inset -6px -6px 12px #ffffff;
         }
 
-        * {
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
-            -webkit-touch-callout: none;
-            user-select: none;
-        }
-
+        * { -webkit-tap-highlight-color: transparent; outline: none; -webkit-touch-callout: none; user-select: none; }
         body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
         
         .app-card { 
@@ -42,12 +36,28 @@
         }
 
         .brand { font-size: 0.75rem; font-weight: 800; color: var(--navy); letter-spacing: 1.5px; margin-bottom: 15px; }
-        .display-area { width: 100%; height: 95px; background: #1a1a1a; border-radius: 20px; position: relative; margin-bottom: 20px; display: flex; justify-content: center; align-items: center; box-shadow: inset 0 5px 15px rgba(0,0,0,0.6); overflow: hidden; }
         
-        /* 아날로그 바늘 스타일 */
+        /* 디스플레이 영역 정렬 수정 */
+        .display-area { 
+            width: 100%; height: 95px; background: #1a1a1a; border-radius: 20px; 
+            position: relative; margin-bottom: 20px; 
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.6); overflow: hidden;
+        }
+
+        /* [수정] 바늘과 축의 절대 정렬 */
+        #analog-view {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0; left: 0;
+            display: flex; justify-content: center; align-items: flex-end; /* 하단 기준 정렬 */
+        }
+
         .needle { 
-            width: 5px; height: 70px; background: var(--orange); position: absolute; 
-            bottom: 15px; /* 동그라미 중심에서 시작하도록 조정 */
+            width: 5px; height: 75px; background: var(--orange); 
+            position: absolute; 
+            bottom: 15px; /* 축의 중심 높이 */
+            left: 50%;
             border-radius: 2px 2px 0 0;
             transform-origin: bottom center; 
             transform: translateX(-50%) rotate(0deg);
@@ -57,15 +67,16 @@
         }
         .needle.moving { filter: blur(1.5px); opacity: 0.8; }
 
-        /* [추가] 바늘 하단 축 동그라미 */
         .needle-cap {
-            width: 18px; height: 18px; background: var(--orange); position: absolute;
-            bottom: 6px; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 20px; background: var(--orange); 
+            position: absolute;
+            bottom: 5px; /* 바늘 bottom의 절반 정도 위치에 고정 */
+            left: 50%; transform: translateX(-50%);
             border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            z-index: 10; /* 바늘보다 위에 위치 */
+            z-index: 10;
         }
 
-        .led-row { display: none; justify-content: center; gap: 12px; width: 90%; }
+        .led-row { display: none; justify-content: center; gap: 12px; width: 90%; align-items: center; height: 100%; }
         .led { width: 20px; height: 20px; background: #333; border-radius: 50%; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
         .led.active-normal { background: var(--green); box-shadow: 0 0 15px var(--green); }
         .led.active-accent { background: var(--orange); box-shadow: 0 0 15px var(--orange); }
@@ -101,13 +112,13 @@
 
 <div class="app-card">
     <div class="side-left">
-        <div class="brand">SONG, YOUNG MIN GUITAR LAB</div>
+        <div class="brand">SONG,YOUNG MIN GUITAR LAB</div>
         <div class="btn-row">
             <button id="btnAnalog" class="btn active" style="box-shadow: var(--shadow-in); color: var(--orange);">ANALOG</button>
             <button id="btnDigital" class="btn">DIGITAL</button>
         </div>
         <div class="display-area">
-            <div id="analog-view" style="width:100%; display:flex; justify-content:center; position:relative;">
+            <div id="analog-view">
                 <div class="needle" id="needle"></div>
                 <div class="needle-cap"></div>
             </div>
@@ -135,11 +146,9 @@
             <button class="btn" data-val="4" id="defaultTime">4/4</button>
             <button class="btn" data-val="6">6/8</button>
         </div>
-        
         <div class="btn-row" style="margin-bottom: 5px;">
             <button id="clickToggle" class="btn btn-click">CLICK (Same Sound)</button>
         </div>
-
         <div class="bottom-controls">
             <button id="tapBtn" class="tap-btn">TAP TEMPO</button>
             <button id="startBtn" class="start-btn">START</button>
@@ -149,7 +158,6 @@
 
 <script>
     let audioCtx = null, isPlaying = false, bpm = 120, measure = 4, currentTick = 0, nextTickTime = 0, timerID = null, isSameSound = false, currentMode = 'analog';
-    
     let tapTimes = [];
     const tapBtn = document.getElementById('tapBtn');
     const needle = document.getElementById('needle'), startBtn = document.getElementById('startBtn'), mainBpm = document.getElementById('mainBpm'), tempoRange = document.getElementById('tempoRange'), digitalView = document.getElementById('digital-view'), clickToggle = document.getElementById('clickToggle');
