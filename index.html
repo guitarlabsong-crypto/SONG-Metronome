@@ -139,7 +139,7 @@
     function scheduler() { while (nextTickTime < audioCtx.currentTime + 0.1) { playSound(nextTickTime, currentTick); nextTickTime += (60.0 / bpm); currentTick++; } timerID = requestAnimationFrame(scheduler); }
 
     function updateBpm(val) {
-        bpm = Math.min(Math.max(parseInt(val), 1), 400);
+        bpm = Math.min(Math.max(parseInt(val), 28), 365);
         tempoRange.value = bpm;
         mainBpm.innerText = bpm;
     }
