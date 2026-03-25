@@ -2,55 +2,155 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Metronome</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SONG, YOUNG MIN Guitar Lab Metronome</title>
     <style>
-        :root { --main-color: #4a90e2; --bg-color: #f4f7f6; }
-        body { font-family: sans-serif; background: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .container { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
+        :root { --primary: #2c3e50; --accent: #e74c3c; --bg: #ecf0f1; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         
-        /* 반응형 텍스트 및 레이아웃 */
-        h1 { font-size: 1.5rem; color: #333; margin-bottom: 1rem; }
-        .bpm-display { font-size: 4rem; font-weight: bold; color: var(--main-color); margin: 10px 0; }
+        .metronome-card { background: white; width: 90%; max-width: 450px; padding: 25px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); position: relative; text-align: center; }
         
-        .controls { display: flex; flex-direction: column; gap: 15px; }
-        .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        
-        input[type="range"] { width: 100%; cursor: pointer; }
-        select, button { padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 1rem; }
-        
-        .start-btn { background: var(--main-color); color: white; border: none; font-size: 1.2rem; font-weight: bold; margin-top: 10px; transition: 0.2s; }
-        .start-btn.running { background: #e74c3c; }
-        
-        /* 가로 모드 대응 */
+        /* 워터마크 */
+        .watermark { font-size: 0.7rem; font-weight: bold; color: #bdc3c7; letter-spacing: 1px; margin-bottom: 10px; }
+
+        /* 바늘침 (Pendulum) */
+        .visualizer { width: 100%; height: 120px; background: #f9f9f9; border-radius: 15px; position: relative; overflow: hidden; margin-bottom: 20px; border: 1px solid #eee; }
+        .needle { width: 4px; height: 80px; background: var(--primary); position: absolute; bottom: 10px; left: 50%; transform-origin: bottom center; transform: translateX(-50%) rotate(0deg); transition: transform 0.1s ease-out; }
+        .center-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); }
+
+        .bpm-text { font-size: 3.5rem; font-weight: 800; color: var(--primary); margin: 10px 0; }
+
+        /* 박자/음표 버튼 그룹 */
+        .btn-group { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        .toggle-btn { padding: 10px 15px; border: 2px solid #ddd; border-radius: 12px; background: white; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
+        .toggle-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        input[type="range"] { width: 100%; margin: 20px 0; accent-color: var(--primary); }
+
+        .start-btn { width: 100%; padding: 18px; border: none; border-radius: 15px; background: var(--accent); color: white; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .start-btn.running { background: #34495e; }
+
+        /* 가로 모드 최적화 */
         @media (orientation: landscape) and (max-height: 500px) {
-            .container { display: flex; max-width: 600px; gap: 20px; align-items: center; }
-            .bpm-display { font-size: 3rem; }
+            .metronome-card { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 600px; padding: 15px; }
+            .visualizer { height: 100px; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div>
-        <h1>Metronome</h1>
-        <div class="bpm-display" id="bpmValue">120</div>
+<div class="metronome-card">
+    <div class="watermark">SONG, YOUNG MIN GUITAR LAB</div>
+    
+    <div class="visualizer">
+        <div class="needle" id="needle"></div>
+        <div class="center-dot"></div>
     </div>
 
-    <div class="controls">
-        <input type="range" id="tempo" min="40" max="240" value="120">
-        
-        <div class="row">
-            <select id="timeSignature">
-                <option value="3">3/4 박자</option>
-                <option value="4" selected>4/4 박자</option>
-            </select>
-            <select id="noteValue">
-                <option value="1">4분 음표</option>
-                <option value="4">16분 음표</option>
-            </select>
+    <div class="main-controls">
+        <div class="bpm-text" id="bpmText">120</div>
+        <input type="range" id="tempoRange" min="40" max="240" value="120">
+
+        <div class="btn-group" id="timeSigGroup">
+            <button class="toggle-btn" data-val="3">3/4</button>
+            <button class="toggle-btn active" data-val="4">4/4</button>
+        </div>
+
+        <div class="btn-group" id="noteValGroup">
+            <button class="toggle-btn active" data-val="1">4분음표</button>
+            <button class="toggle-btn" data-val="4">16분음표</button>
         </div>
 
         <button id="startBtn" class="start-btn">START</button>
     </div>
 </div>
+
+<script>
+    let audioCtx = null;
+    let isRunning = false;
+    let tempo = 120;
+    let beatsPerMeasure = 4;
+    let subdivision = 1;
+    let currentBeat = 0;
+    let nextTickTime = 0;
+    let timerID = null;
+
+    const needle = document.getElementById('needle');
+    const startBtn = document.getElementById('startBtn');
+    const tempoRange = document.getElementById('tempoRange');
+    const bpmText = document.getElementById('bpmText');
+
+    // 오디오 클릭 소리 생성
+    function playClick(time, isStrong) {
+        const osc = audioCtx.createOscillator();
+        const envelope = audioCtx.createGain();
+
+        osc.frequency.value = isStrong ? 1200 : 800;
+        envelope.gain.exponentialRampToValueAtTime(1, time);
+        envelope.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+
+        osc.connect(envelope);
+        envelope.connect(audioCtx.destination);
+        osc.start(time);
+        osc.stop(time + 0.05);
+
+        // 바늘 애니메이션 연동
+        const angle = (currentBeat % 2 === 0) ? -30 : 30;
+        setTimeout(() => {
+            needle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+        }, (time - audioCtx.currentTime) * 1000);
+    }
+
+    function scheduler() {
+        while (nextTickTime < audioCtx.currentTime + 0.1) {
+            const isFirstBeat = (currentBeat % (beatsPerMeasure * subdivision)) === 0;
+            playClick(nextTickTime, isFirstBeat);
+            
+            const secondsPerBeat = 60.0 / tempo / subdivision;
+            nextTickTime += secondsPerBeat;
+            currentBeat++;
+        }
+        timerID = requestAnimationFrame(scheduler);
+    }
+
+    // 이벤트 리스너: 박자 및 음표 선택
+    function setupButtons(groupId, callback) {
+        const buttons = document.querySelectorAll(`#${groupId} .toggle-btn`);
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelector(`#${groupId} .active`).classList.remove('active');
+                btn.classList.add('active');
+                callback(btn.dataset.val);
+            });
+        });
+    }
+
+    setupButtons('timeSigGroup', val => beatsPerMeasure = parseInt(val));
+    setupButtons('noteValGroup', val => subdivision = parseInt(val));
+
+    tempoRange.addEventListener('input', (e) => {
+        tempo = e.target.value;
+        bpmText.innerText = tempo;
+    });
+
+    startBtn.addEventListener('click', () => {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        isRunning = !isRunning;
+        if (isRunning) {
+            currentBeat = 0;
+            nextTickTime = audioCtx.currentTime;
+            scheduler();
+            startBtn.innerText = 'STOP';
+            startBtn.classList.add('running');
+        } else {
+            cancelAnimationFrame(timerID);
+            startBtn.innerText = 'START';
+            startBtn.classList.remove('running');
+            needle.style.transform = `translateX(-50%) rotate(0deg)`;
+        }
+    });
+</script>
+
+</body>
+</html>
